@@ -1,0 +1,15 @@
+FROM golang:1.20-alpine AS build
+WORKDIR /app
+COPY go.mod go.sum ./
+RUN apk add --no-cache git
+COPY . .
+
+# build payments and files
+RUN go build -o /payments ./cmd/payments
+RUN go build -o /files ./cmd/files
+
+FROM alpine:3.18
+RUN apk add --no-cache ca-certificates
+COPY --from=build /payments /usr/local/bin/payments
+COPY --from=build /files /usr/local/bin/files
+CMD ["/usr/local/bin/payments"]

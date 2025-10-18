@@ -1,0 +1,31 @@
+version: "3.8"
+services:
+  aegis:
+    build: ..
+    ports:
+      - "8080:8080"
+    environment:
+      - OTEL_EXPORTER=otlp
+    depends_on:
+      - otel-collector
+  payments:
+    build:
+      context: ..
+      dockerfile: Dockerfile.adapters
+    command: ["/usr/local/bin/payments"]
+  files:
+    build:
+      context: ..
+      dockerfile: Dockerfile.adapters
+    command: ["/usr/local/bin/files"]
+  otel-collector:
+    image: otel/opentelemetry-collector:0.86.0
+    command: ["--config=/conf/otel-collector-config.yml"]
+    volumes:
+      - ./otel-collector-config.yml:/conf/otel-collector-config.yml:ro
+    ports:
+      - "4317:4317"
+  jaeger:
+    image: jaegertracing/all-in-one:1.41
+    ports:
+      - "16686:16686"

@@ -1,0 +1,16 @@
+receivers:
+  otlp:
+    protocols:
+      grpc: {}
+
+exporters:
+  logging:
+    loglevel: debug
+  jaeger:
+    endpoint: "jaeger:14250"
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      exporters: [logging]
